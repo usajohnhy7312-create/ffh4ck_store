@@ -17,7 +17,6 @@
 </head>
 <body class="bg-slate-950 text-white font-sans min-h-screen">
 
-  <!-- LANDING -->
   <div id="view-landing" class="view flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-black p-6 text-center space-y-8">
     <div class="space-y-4">
       <h1 class="text-5xl font-bold gradient-text">
@@ -42,7 +41,6 @@
     </button>
   </div>
 
-  <!-- AUTH / LOGIN -->
   <div id="view-auth" class="view hidden min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-md bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl space-y-6">
       <div class="text-center">
@@ -72,7 +70,6 @@
     </div>
   </div>
 
-  <!-- STORE -->
   <div id="view-store" class="view hidden min-h-screen pb-20">
     <header class="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-4 flex justify-between items-center">
       <h2 class="text-xl font-bold text-red-500">Rajesh Store</h2>
@@ -87,11 +84,9 @@
     </header>
 
     <div class="p-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <!-- Products will be inserted here by JS -->
-    </div>
+      </div>
   </div>
 
-  <!-- DETAILS -->
   <div id="view-details" class="view hidden min-h-screen">
     <header class="p-4 flex items-center space-x-4 border-b border-slate-800">
       <button onclick="showView('store')" class="p-2 hover:bg-slate-800 rounded-full">
@@ -134,7 +129,6 @@
     </div>
   </div>
 
-  <!-- CHECKOUT -->
   <div id="view-checkout" class="view hidden min-h-screen">
     <header class="p-4 flex items-center space-x-4 border-b border-slate-800">
       <button onclick="showView('details')" class="p-2 hover:bg-slate-800 rounded-full">
@@ -177,7 +171,6 @@
     </div>
   </div>
 
-  <!-- SUCCESS -->
   <div id="view-success" class="view hidden min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-6">
     <div class="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center text-white">
       <i class="fas fa-check-circle text-5xl"></i>
@@ -196,7 +189,6 @@
     </button>
   </div>
 
-  <!-- HISTORY -->
   <div id="view-history" class="view hidden min-h-screen">
     <header class="p-4 flex items-center space-x-4 border-b border-slate-800 sticky top-0 bg-slate-950">
       <button onclick="showView('store')" class="p-2 hover:bg-slate-800 rounded-full">
@@ -206,8 +198,7 @@
     </header>
 
     <div id="history-list" class="p-4 space-y-4">
-      <!-- Orders inserted by JS -->
-    </div>
+      </div>
   </div>
 
   <script>
@@ -321,24 +312,67 @@
 
     function placeOrder() {
       if (!selectedProduct) return;
+      
       const price = selectedDuration === 10 ? selectedProduct.p10 :
                     selectedDuration === 20 ? selectedProduct.p20 : selectedProduct.p30;
+      
+      const utrValue = document.getElementById('utr-input').value;
+      const phoneValue = document.getElementById('phone-input').value;
+      const btn = document.getElementById('place-order-btn');
 
-      const newOrder = {
-        id: Math.random().toString(36).substr(2,9),
-        productName: selectedProduct.name,
-        duration: selectedDuration,
-        price: price,
-        date: new Date().toLocaleDateString(),
-        status: 'Pending',
-        transactionId: 'TXN' + Math.random().toString(36).substr(2,9).toUpperCase(),
-        utr: document.getElementById('utr-input').value
+      // Disable button and show loading
+      btn.disabled = true;
+      btn.innerText = "SENDING...";
+
+      // Data to send to Formspree
+      const orderData = {
+        product: selectedProduct.name,
+        duration: selectedDuration + " Days",
+        price: "₹" + price,
+        utr_number: utrValue,
+        whatsapp: phoneValue,
+        order_date: new Date().toLocaleString()
       };
 
-      orders.unshift(newOrder);
-      document.getElementById('utr-input').value = '';
-      document.getElementById('phone-input').value = '';
-      showView('success');
+      // Formspree Integration
+      fetch("https://formspree.io/f/mgolnkeq", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+      })
+      .then(response => {
+        if (response.ok) {
+          // Add to local history
+          const newOrder = {
+            id: Math.random().toString(36).substr(2,9),
+            productName: selectedProduct.name,
+            duration: selectedDuration,
+            price: price,
+            date: new Date().toLocaleDateString(),
+            status: 'Pending',
+            transactionId: 'TXN' + Math.random().toString(36).substr(2,9).toUpperCase(),
+            utr: utrValue
+          };
+          orders.unshift(newOrder);
+          
+          // Clear inputs and show success
+          document.getElementById('utr-input').value = '';
+          document.getElementById('phone-input').value = '';
+          showView('success');
+        } else {
+          alert("Error placing order. Please contact support.");
+        }
+      })
+      .catch(error => {
+        alert("Check your internet connection.");
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.innerText = "PLACE ORDER";
+      });
     }
 
     function renderHistory() {
