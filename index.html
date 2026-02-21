@@ -1,90 +1,537 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Rajesh Gaming Store</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<pre style="color: rgb(0, 0, 0); font-style: normal; font-weight: 400; text-align: start; text-indent: 0px; text-transform: none; white-space: pre-wrap;">import React, { useState } from 'react';
+import Head from 'next/head';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  History, 
+  ArrowLeft, 
+  Zap, 
+  Crosshair, 
+  QrCode, 
+  CheckCircle
+} from 'lucide-react';
 
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-950 text-white font-sans">
+// --- Types ---
 
-<!-- LANDING VIEW -->
-<div id="landing" class="flex flex-col items-center justify-center min-h-screen text-center p-6 space-y-8 bg-gradient-to-br from-slate-900 to-black">
-  <div class="space-y-4">
-    <h1 class="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
-      Rajesh Gaming Store
-    </h1>
-    <p class="text-xl text-gray-400">Premium Digital Assets & Gaming Tools</p>
+type ViewState = 'LANDING' | 'AUTH' | 'STORE' | 'DETAILS' | 'CHECKOUT' | 'SUCCESS' | 'HISTORY';
 
-    <div class="flex items-center justify-center space-x-2 text-sm text-gray-500">
-      <span>Seller: Rajesh</span>
-      <span class="w-1 h-1 bg-gray-500 rounded-full"></span>
-      <a href="#" class="text-blue-400 hover:underline">Follow on Instagram</a>
-    </div>
-
-    <div class="inline-block px-4 py-2 bg-slate-800 rounded-full border border-slate-700">
-      <span class="text-green-400 font-bold">15,000+</span> Satisfied Users
-    </div>
-  </div>
-
-  <button onclick="showAuth()" class="px-8 py-4 bg-red-600 hover:bg-red-700 rounded-lg text-xl font-bold">
-    ENTER STORE
-  </button>
-</div>
-
-<!-- AUTH VIEW -->
-<div id="auth" class="hidden min-h-screen flex items-center justify-center p-4">
-  <div class="w-full max-w-md bg-slate-900 p-8 rounded-2xl border border-slate-800 space-y-6">
-    <div class="text-center">
-      <h2 class="text-3xl font-bold">Welcome Back</h2>
-      <p class="text-gray-400">Sign in to access the store</p>
-    </div>
-
-    <form onsubmit="login(event)" class="space-y-4">
-      <input required type="text" placeholder="Email or Phone"
-        class="w-full bg-slate-800 border border-slate-700 rounded-lg p-3">
-      <input required type="password" placeholder="Password"
-        class="w-full bg-slate-800 border border-slate-700 rounded-lg p-3">
-      <button class="w-full bg-red-600 py-3 rounded-lg font-bold">
-        LOGIN / SIGN UP
-      </button>
-    </form>
-  </div>
-</div>
-
-<!-- STORE VIEW -->
-<div id="store" class="hidden min-h-screen p-4">
-  <h2 class="text-xl font-bold text-red-500 mb-6">Rajesh Store</h2>
-
-  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-4">
-      <img src="https://placehold.co/600x400/0f172a/ef4444?text=HAXXCKER+PRO"
-        class="rounded-lg">
-      <h3 class="font-bold">HAXXCKER PRO INJECTOR</h3>
-      <p class="text-green-400">Only 1227 Keys Available</p>
-      <button class="w-full bg-white text-black font-bold py-2 rounded">
-        BUY NOW
-      </button>
-    </div>
-
-  </div>
-</div>
-
-<script>
-function showAuth() {
-  document.getElementById("landing").classList.add("hidden");
-  document.getElementById("auth").classList.remove("hidden");
+interface Product {
+  id: number;
+  name: string;
+  image: string;
+  keysAvailable: number;
+  basePrice10: number;
+  basePrice20: number;
+  basePrice30: number;
+  features: string[];
 }
 
-function login(e) {
-  e.preventDefault();
-  document.getElementById("auth").classList.add("hidden");
-  document.getElementById("store").classList.remove("hidden");
+interface Order {
+  id: string;
+  productName: string;
+  duration: number;
+  price: number;
+  date: string;
+  status: 'Pending' | 'Delivered';
+  transactionId: string;
+  utr: string;
 }
-</script>
 
-</body>
-</html>
+// --- Data Configuration ---
+
+// Feature Sets
+const FEATURES_PKG_1 = [
+  "HEADSHOT HACK",
+  "ESP LINE LOCATION",
+  "ESP NAME",
+  "ESP HEALTH",
+  "STREAMER MODE",
+  "HIDE FROM SCREEN CAPTURE",
+  "AIM FOV 360Â°"
+];
+
+const FEATURES_PKG_2_TO_7 = [
+  "AIM KILL",
+  "AIM MAGNET",
+  "SILENT AIM",
+  "AIMBOT LIGHT",
+  "SPEED TIMER",
+  "GHOST HACK",
+  "ESP LINE LOCATION",
+  "ESP NAME",
+  "ESP HEALTH",
+  "CS / BR RANK WORKING"
+];
+
+const PRODUCTS: Product[] = [
+  {
+    id: 1,
+    name: "HAXXCKER PRO INJECTOR",
+    image: "https://placehold.co/600x400/0f172a/ef4444?text=HAXXCKER+PRO",
+    keysAvailable: 1227,
+    basePrice10: 550,
+    basePrice20: 1050,
+    basePrice30: 1450,
+    features: FEATURES_PKG_1
+  },
+  {
+    id: 2,
+    name: "BR MODS",
+    image: "https://placehold.co/600x400/0f172a/ef4444?text=BR+MODS",
+    keysAvailable: 371,
+    basePrice10: 400,
+    basePrice20: 750,
+    basePrice30: 1050,
+    features: FEATURES_PKG_2_TO_7
+  },
+  {
+    id: 3,
+    name: "PATO TEAM",
+    image: "https://placehold.co/600x400/0f172a/ef4444?text=PATO+TEAM",
+    keysAvailable: 2611,
+    basePrice10: 550,
+    basePrice20: 1050,
+    basePrice30: 1450,
+    features: FEATURES_PKG_2_TO_7
+  },
+  {
+    id: 4,
+    name: "Drip Client",
+    image: "https://placehold.co/600x400/0f172a/ef4444?text=DRIP+CLIENT",
+    keysAvailable: 738,
+    basePrice10: 150,
+    basePrice20: 300,
+    basePrice30: 450,
+    features: FEATURES_PKG_2_TO_7
+  },
+  {
+    id: 5,
+    name: "HG CHEATS",
+    image: "https://placehold.co/600x400/0f172a/ef4444?text=HG+CHEATS",
+    keysAvailable: 572,
+    basePrice10: 499,
+    basePrice20: 759,
+    basePrice30: 999,
+    features: FEATURES_PKG_2_TO_7
+  },
+  {
+    id: 6,
+    name: "XERA PANEL",
+    image: "https://placehold.co/600x400/0f172a/ef4444?text=XERA+PANEL",
+    keysAvailable: 102,
+    basePrice10: 450,
+    basePrice20: 750,
+    basePrice30: 1000,
+    features: FEATURES_PKG_2_TO_7
+  },
+  {
+    id: 7,
+    name: "TWISTER PANEL",
+    image: "https://placehold.co/600x400/0f172a/ef4444?text=TWISTER+PANEL",
+    keysAvailable: 917,
+    basePrice10: 250,
+    basePrice20: 450,
+    basePrice30: 700,
+    features: FEATURES_PKG_2_TO_7
+  }
+];
+
+// --- Sub-Components ---
+
+const LandingView = ({ setView }: { setView: (v: ViewState) =&gt; void }) =&gt; (
+  &lt;div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-black text-white p-6 text-center space-y-8"&gt;
+    &lt;motion.div 
+      initial={{ scale: 0.8, opacity: 0 }} 
+      animate={{ scale: 1, opacity: 1 }} 
+      className="space-y-4"
+    &gt;
+      &lt;h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500"&gt;
+        Rajesh Gaming Store
+      &lt;/h1&gt;
+      &lt;p className="text-xl text-gray-400"&gt;Premium Digital Assets &amp; Gaming Tools&lt;/p&gt;
+      
+      &lt;div className="flex items-center justify-center space-x-2 text-sm text-gray-500"&gt;
+        &lt;span&gt;Seller: Rajesh&lt;/span&gt;
+        &lt;span className="w-1 h-1 bg-gray-500 rounded-full"&gt;&lt;/span&gt;
+        &lt;a href="#" className="text-blue-400 hover:underline"&gt;Follow on Instagram&lt;/a&gt;
+      &lt;/div&gt;
+
+      &lt;div className="inline-block px-4 py-2 bg-slate-800 rounded-full border border-slate-700"&gt;
+        &lt;span className="text-green-400 font-bold"&gt;15,000+&lt;/span&gt; Satisfied Users
+      &lt;/div&gt;
+    &lt;/motion.div&gt;
+
+    &lt;motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={() =&gt; setView('AUTH')}
+      className="px-8 py-4 bg-red-600 hover:bg-red-700 rounded-lg text-xl font-bold shadow-lg shadow-red-900/50 transition-all"
+    &gt;
+      ENTER STORE
+    &lt;/motion.button&gt;
+  &lt;/div&gt;
+);
+
+const AuthView = ({ handleLogin, isProcessing }: { handleLogin: (e: React.FormEvent) =&gt; void, isProcessing: boolean }) =&gt; (
+  &lt;div className="min-h-screen bg-slate-950 flex items-center justify-center p-4"&gt;
+    &lt;div className="w-full max-w-md bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl space-y-6"&gt;
+      &lt;div className="text-center"&gt;
+        &lt;h2 className="text-3xl font-bold text-white"&gt;Welcome Back&lt;/h2&gt;
+        &lt;p className="text-gray-400"&gt;Sign in to access the store&lt;/p&gt;
+      &lt;/div&gt;
+
+      {isProcessing ? (
+         &lt;div className="flex flex-col items-center justify-center py-10 space-y-4"&gt;
+           &lt;div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"&gt;&lt;/div&gt;
+           &lt;p className="text-gray-400"&gt;Verifying Credentials...&lt;/p&gt;
+         &lt;/div&gt;
+      ) : (
+        &lt;form onSubmit={handleLogin} className="space-y-4"&gt;
+          &lt;div&gt;
+            &lt;label className="block text-sm font-medium text-gray-400 mb-1"&gt;Email or Phone&lt;/label&gt;
+            &lt;input required type="text" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-red-500 outline-none" placeholder="Enter your details" /&gt;
+          &lt;/div&gt;
+          &lt;div&gt;
+            &lt;label className="block text-sm font-medium text-gray-400 mb-1"&gt;Password&lt;/label&gt;
+            &lt;input required type="password" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-red-500 outline-none" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" /&gt;
+          &lt;/div&gt;
+          &lt;button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition-colors"&gt;
+            LOGIN / SIGN UP
+          &lt;/button&gt;
+          &lt;p className="text-xs text-center text-gray-500"&gt;One-time login. You will remain logged in.&lt;/p&gt;
+        &lt;/form&gt;
+      )}
+    &lt;/div&gt;
+  &lt;/div&gt;
+);
+
+const StoreView = ({ 
+  setView, 
+  orders, 
+  handleProductSelect 
+}: { 
+  setView: (v: ViewState) =&gt; void, 
+  orders: Order[], 
+  handleProductSelect: (p: Product) =&gt; void 
+}) =&gt; (
+  &lt;div className="min-h-screen bg-slate-950 text-white pb-20"&gt;
+    &lt;header className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-4 flex justify-between items-center"&gt;
+      &lt;h2 className="text-xl font-bold text-red-500"&gt;Rajesh Store&lt;/h2&gt;
+      &lt;div className="flex space-x-4"&gt;
+        {orders.length &gt; 0 &amp;&amp; (
+          &lt;button onClick={() =&gt; setView('HISTORY')} className="p-2 bg-slate-800 rounded-full hover:bg-slate-700"&gt;
+             &lt;History size={20} /&gt;
+          &lt;/button&gt;
+        )}
+        &lt;div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center font-bold"&gt;
+          R
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/header&gt;
+
+    &lt;div className="p-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3"&gt;
+      {PRODUCTS.map((product) =&gt; (
+        &lt;motion.div 
+          key={product.id} 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col space-y-4 hover:border-red-500/50 transition-colors"
+        &gt;
+          &lt;div className="h-40 w-full overflow-hidden rounded-lg bg-slate-800"&gt;
+             &lt;img 
+                src={product.image} 
+                alt={product.name} 
+                className="w-full h-full object-cover"
+                loading="lazy"
+             /&gt;
+          &lt;/div&gt;
+          &lt;div&gt;
+            &lt;h3 className="text-lg font-bold"&gt;{product.name}&lt;/h3&gt;
+            &lt;p className="text-sm text-green-400 font-mono"&gt;Only {product.keysAvailable} Keys Available&lt;/p&gt;
+          &lt;/div&gt;
+          &lt;button 
+            onClick={() =&gt; handleProductSelect(product)}
+            className="mt-auto w-full bg-white text-black font-bold py-2 rounded hover:bg-gray-200"
+          &gt;
+            BUY NOW
+          &lt;/button&gt;
+        &lt;/motion.div&gt;
+      ))}
+    &lt;/div&gt;
+  &lt;/div&gt;
+);
+
+const DetailsView = ({ 
+  selectedProduct, 
+  setView, 
+  selectedDuration, 
+  setSelectedDuration, 
+  price 
+}: { 
+  selectedProduct: Product | null, 
+  setView: (v: ViewState) =&gt; void, 
+  selectedDuration: 10 | 20 | 30, 
+  setSelectedDuration: (d: 10 | 20 | 30) =&gt; void,
+  price: number
+}) =&gt; {
+  if (!selectedProduct) return null;
+
+  return (
+    &lt;div className="min-h-screen bg-slate-950 text-white"&gt;
+      &lt;header className="p-4 flex items-center space-x-4 border-b border-slate-800"&gt;
+        &lt;button onClick={() =&gt; setView('STORE')} className="p-2 hover:bg-slate-800 rounded-full"&gt;
+          &lt;ArrowLeft /&gt;
+        &lt;/button&gt;
+        &lt;h2 className="font-bold text-lg"&gt;Product Details&lt;/h2&gt;
+      &lt;/header&gt;
+
+      &lt;div className="p-6 space-y-6 max-w-2xl mx-auto"&gt;
+        &lt;div className="text-center space-y-4"&gt;
+          &lt;div className="w-full h-48 bg-slate-800 rounded-xl overflow-hidden"&gt;
+             &lt;img 
+               src={selectedProduct.image} 
+               alt={selectedProduct.name} 
+               className="w-full h-full object-cover"
+             /&gt;
+          &lt;/div&gt;
+          &lt;h1 className="text-2xl font-bold"&gt;{selectedProduct.name}&lt;/h1&gt;
+        &lt;/div&gt;
+
+        &lt;div className="bg-slate-900 rounded-xl p-4 space-y-3 border border-slate-800"&gt;
+          &lt;h3 className="text-gray-400 text-sm font-bold uppercase tracking-wider"&gt;Features&lt;/h3&gt;
+          &lt;ul className="space-y-2"&gt;
+            {selectedProduct.features.map((feature, idx) =&gt; (
+              &lt;li key={idx} className="flex items-start space-x-2 text-sm"&gt;
+                &lt;CheckCircle size={16} className="text-green-500 mt-0.5 shrink-0" /&gt;
+                &lt;span&gt;{feature}&lt;/span&gt;
+              &lt;/li&gt;
+            ))}
+          &lt;/ul&gt;
+        &lt;/div&gt;
+
+        &lt;div className="space-y-3"&gt;
+          &lt;label className="text-sm text-gray-400 font-bold uppercase"&gt;Select Duration&lt;/label&gt;
+          &lt;div className="grid grid-cols-3 gap-3"&gt;
+            {[10, 20, 30].map((days) =&gt; (
+              &lt;button
+                key={days}
+                onClick={() =&gt; setSelectedDuration(days as 10 | 20 | 30)}
+                className={`py-3 rounded-lg border font-bold transition-all ${
+                  selectedDuration === days 
+                    ? 'bg-red-600 border-red-500 text-white'
+                    : 'bg-slate-900 border-slate-800 text-gray-400 hover:bg-slate-800'
+                }`}
+              &gt;
+                {days} Days
+              &lt;/button&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div className="flex items-center justify-between bg-slate-900 p-4 rounded-xl border border-slate-800"&gt;
+          &lt;span className="text-gray-400"&gt;Total Price&lt;/span&gt;
+          &lt;span className="text-2xl font-bold text-green-400"&gt;â‚¹{price}&lt;/span&gt;
+        &lt;/div&gt;
+
+        &lt;button 
+          onClick={() =&gt; setView('CHECKOUT')}
+          className="w-full bg-red-600 hover:bg-red-700 py-4 rounded-xl font-bold text-lg shadow-lg shadow-red-900/30"
+        &gt;
+          ORDER NOW
+        &lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+};
+
+const CheckoutView = ({ 
+  price, 
+  setView, 
+  utrNumber, 
+  setUtrNumber, 
+  phoneNumber, 
+  setPhoneNumber, 
+  handlePlaceOrder 
+}: { 
+  price: number, 
+  setView: (v: ViewState) =&gt; void, 
+  utrNumber: string, 
+  setUtrNumber: (s: string) =&gt; void, 
+  phoneNumber: string, 
+  setPhoneNumber: (s: string) =&gt; void,
+  handlePlaceOrder: () =&gt; void
+}) =&gt; {
+  return (
+    &lt;div className="min-h-screen bg-slate-950 text-white"&gt;
+      &lt;header className="p-4 flex items-center space-x-4 border-b border-slate-800"&gt;
+        &lt;button onClick={() =&gt; setView('DETAILS')} className="p-2 hover:bg-slate-800 rounded-full"&gt;
+          &lt;ArrowLeft /&gt;
+        &lt;/button&gt;
+        &lt;h2 className="font-bold text-lg"&gt;Checkout&lt;/h2&gt;
+      &lt;/header&gt;
+
+      &lt;div className="p-6 max-w-md mx-auto space-y-6"&gt;
+        &lt;div className="bg-white text-black p-6 rounded-2xl flex flex-col items-center space-y-4"&gt;
+           &lt;QrCode size={160} /&gt;
+           &lt;div className="text-center"&gt;
+             &lt;p className="font-bold text-xl uppercase tracking-widest"&gt;Scan &amp; Pay&lt;/p&gt;
+             &lt;p className="text-2xl font-bold mt-2"&gt;â‚¹{price}&lt;/p&gt;
+           &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div className="space-y-4"&gt;
+          &lt;div&gt;
+            &lt;label className="block text-sm text-gray-400 mb-1"&gt;UTR / Reference No (12 Digits)&lt;/label&gt;
+            {/* 
+                Improved Input for Mobile: 
+                type="tel" ensures numeric keypad opens on mobile.
+                inputMode="numeric" reinforces this.
+                pattern="[0-9]*" helps with validation.
+            */}
+            &lt;input 
+              type="tel" 
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={12}
+              value={utrNumber}
+              onChange={(e) =&gt; setUtrNumber(e.target.value.replace(/\D/g, ''))}
+              className="w-full bg-slate-900 border border-slate-700 p-4 rounded-lg font-mono text-lg focus:border-red-500 outline-none"
+              placeholder="Enter 12 digit UTR"
+            /&gt;
+          &lt;/div&gt;
+
+          &lt;div&gt;
+            &lt;label className="block text-sm text-gray-400 mb-1"&gt;WhatsApp Number for Delivery&lt;/label&gt;
+            &lt;input 
+               type="tel"
+               inputMode="numeric"
+               value={phoneNumber}
+               onChange={(e) =&gt; setPhoneNumber(e.target.value)}
+               className="w-full bg-slate-900 border border-slate-700 p-4 rounded-lg font-mono text-lg focus:border-red-500 outline-none"
+               placeholder="Enter phone number"
+            /&gt;
+          &lt;/div&gt;
+
+          &lt;button 
+            onClick={handlePlaceOrder}
+            disabled={utrNumber.length !== 12 || !phoneNumber}
+            className="w-full bg-green-600 disabled:bg-slate-800 disabled:text-gray-500 hover:bg-green-700 py-4 rounded-xl font-bold text-lg"
+          &gt;
+            PLACE ORDER
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+};
+
+const SuccessView = ({ setView }: { setView: (v: ViewState) =&gt; void }) =&gt; (
+  &lt;div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-6"&gt;
+    &lt;motion.div 
+      initial={{ scale: 0 }} 
+      animate={{ scale: 1 }} 
+      className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center text-white"
+    &gt;
+      &lt;CheckCircle size={48} /&gt;
+    &lt;/motion.div&gt;
+    
+    &lt;div&gt;
+      &lt;h2 className="text-3xl font-bold text-white mb-2"&gt;Order Placed!&lt;/h2&gt;
+      &lt;p className="text-gray-400 max-w-xs mx-auto"&gt;
+        Your key will be delivered to your WhatsApp within &lt;span className="text-white font-bold"&gt;10 - 15 minutes&lt;/span&gt;.
+      &lt;/p&gt;
+    &lt;/div&gt;
+
+    &lt;button 
+      onClick={() =&gt; setView('STORE')}
+      className="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-medium"
+    &gt;
+      Back Home
+    &lt;/button&gt;
+  &lt;/div&gt;
+);
+
+const HistoryView = ({ orders, setView, copyToClipboard }: { orders: Order[], setView: (v: ViewState) =&gt; void, copyToClipboard: (t: string) =&gt; void }) =&gt; (
+  &lt;div className="min-h-screen bg-slate-950 text-white"&gt;
+    &lt;header className="p-4 flex items-center space-x-4 border-b border-slate-800 sticky top-0 bg-slate-950"&gt;
+      &lt;button onClick={() =&gt; setView('STORE')} className="p-2 hover:bg-slate-800 rounded-full"&gt;
+        &lt;ArrowLeft /&gt;
+      &lt;/button&gt;
+      &lt;h2 className="font-bold text-lg"&gt;Order History&lt;/h2&gt;
+    &lt;/header&gt;
+
+    &lt;div className="p-4 space-y-4"&gt;
+      {orders.length === 0 ? (
+         &lt;p className="text-center text-gray-500 mt-10"&gt;No orders yet.&lt;/p&gt;
+      ) : (
+        orders.map((order) =&gt; (
+          &lt;div key={order.id} className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3"&gt;
+            &lt;div className="flex justify-between items-start"&gt;
+              &lt;h3 className="font-bold text-lg"&gt;{order.productName}&lt;/h3&gt;
+              &lt;span className="px-2 py-1 bg-yellow-500/20 text-yellow-500 text-xs rounded font-bold uppercase"&gt;
+                {order.status}
+              &lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div className="text-sm text-gray-400 grid grid-cols-2 gap-2"&gt;
+               &lt;span&gt;Duration: {order.duration} Days&lt;/span&gt;
+               &lt;span&gt;Price: â‚¹{order.price}&lt;/span&gt;
+               &lt;span&gt;Date: {order.date}&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;div 
+              onClick={() =&gt; copyToClipboard(order.transactionId)}
+              className="bg-black/30 p-2 rounded border border-dashed border-gray-700 flex justify-between items-center cursor-pointer hover:bg-black/50"
+            &gt;
+              &lt;span className="text-xs text-gray-500 font-mono"&gt;TRX: {order.transactionId}&lt;/span&gt;
+              &lt;QrCode size={14} className="text-gray-500" /&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        ))
+      )}
+    &lt;/div&gt;
+  &lt;/div&gt;
+);
+
+// --- Main App Component ---
+
+export default function App() {
+  const [view, setView] = useState&lt;ViewState&gt;('LANDING');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState&lt;Product | null&gt;(null);
+  const [selectedDuration, setSelectedDuration] = useState&lt;10 | 20 | 30&gt;(10);
+  const [orders, setOrders] = useState&lt;Order[]&gt;([]);
+  
+  // Checkout Form State
+  const [utrNumber, setUtrNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Handlers
+  const handleLogin = (e: React.FormEvent) =&gt; {
+    e.preventDefault();
+    setIsProcessing(true);
+    setTimeout(() =&gt; {
+      setIsLoggedIn(true);
+      setIsProcessing(false);
+      setView('STORE');
+    }, 2000);
+  };
+
+  const handleProductSelect = (product: Product) =&gt; {
+    setSelectedProduct(product);
+    setSelectedDuration(10); // Reset to default
+    setView('DETAILS');
+  };
+
+  const getPrice = () =&gt; {
+    if (!selectedProduct) return 0;
+    if (selectedDuration === 10) return selectedProduct.basePrice10;
+    if (selectedDuration === 20) return selectedProduct.basePrice20;
+    return selectedProduct.basePrice30;
+  };
+
+  const handlePlaceOrder = () =&gt; {
+    if (!selectedProduct) return;
+
+    const randomTxnId = 'TXN' + Math.random().toString(36).substr(2, 9).toUpperCase();
+
+    const newOrder: Order = {
+      id: Math.random().
