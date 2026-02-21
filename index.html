@@ -1,537 +1,401 @@
-<pre style="color: rgb(0, 0, 0); font-style: normal; font-weight: 400; text-align: start; text-indent: 0px; text-transform: none; white-space: pre-wrap;">import React, { useState } from 'react';
-import Head from 'next/head';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  History, 
-  ArrowLeft, 
-  Zap, 
-  Crosshair, 
-  QrCode, 
-  CheckCircle
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Rajesh Gaming Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* Custom gradient text fallback */
+    .gradient-text {
+      background: linear-gradient(to right, #ef4444, #f97316);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-white font-sans min-h-screen">
 
-// --- Types ---
-
-type ViewState = 'LANDING' | 'AUTH' | 'STORE' | 'DETAILS' | 'CHECKOUT' | 'SUCCESS' | 'HISTORY';
-
-interface Product {
-  id: number;
-  name: string;
-  image: string;
-  keysAvailable: number;
-  basePrice10: number;
-  basePrice20: number;
-  basePrice30: number;
-  features: string[];
-}
-
-interface Order {
-  id: string;
-  productName: string;
-  duration: number;
-  price: number;
-  date: string;
-  status: 'Pending' | 'Delivered';
-  transactionId: string;
-  utr: string;
-}
-
-// --- Data Configuration ---
-
-// Feature Sets
-const FEATURES_PKG_1 = [
-  "HEADSHOT HACK",
-  "ESP LINE LOCATION",
-  "ESP NAME",
-  "ESP HEALTH",
-  "STREAMER MODE",
-  "HIDE FROM SCREEN CAPTURE",
-  "AIM FOV 360Â°"
-];
-
-const FEATURES_PKG_2_TO_7 = [
-  "AIM KILL",
-  "AIM MAGNET",
-  "SILENT AIM",
-  "AIMBOT LIGHT",
-  "SPEED TIMER",
-  "GHOST HACK",
-  "ESP LINE LOCATION",
-  "ESP NAME",
-  "ESP HEALTH",
-  "CS / BR RANK WORKING"
-];
-
-const PRODUCTS: Product[] = [
-  {
-    id: 1,
-    name: "HAXXCKER PRO INJECTOR",
-    image: "https://placehold.co/600x400/0f172a/ef4444?text=HAXXCKER+PRO",
-    keysAvailable: 1227,
-    basePrice10: 550,
-    basePrice20: 1050,
-    basePrice30: 1450,
-    features: FEATURES_PKG_1
-  },
-  {
-    id: 2,
-    name: "BR MODS",
-    image: "https://placehold.co/600x400/0f172a/ef4444?text=BR+MODS",
-    keysAvailable: 371,
-    basePrice10: 400,
-    basePrice20: 750,
-    basePrice30: 1050,
-    features: FEATURES_PKG_2_TO_7
-  },
-  {
-    id: 3,
-    name: "PATO TEAM",
-    image: "https://placehold.co/600x400/0f172a/ef4444?text=PATO+TEAM",
-    keysAvailable: 2611,
-    basePrice10: 550,
-    basePrice20: 1050,
-    basePrice30: 1450,
-    features: FEATURES_PKG_2_TO_7
-  },
-  {
-    id: 4,
-    name: "Drip Client",
-    image: "https://placehold.co/600x400/0f172a/ef4444?text=DRIP+CLIENT",
-    keysAvailable: 738,
-    basePrice10: 150,
-    basePrice20: 300,
-    basePrice30: 450,
-    features: FEATURES_PKG_2_TO_7
-  },
-  {
-    id: 5,
-    name: "HG CHEATS",
-    image: "https://placehold.co/600x400/0f172a/ef4444?text=HG+CHEATS",
-    keysAvailable: 572,
-    basePrice10: 499,
-    basePrice20: 759,
-    basePrice30: 999,
-    features: FEATURES_PKG_2_TO_7
-  },
-  {
-    id: 6,
-    name: "XERA PANEL",
-    image: "https://placehold.co/600x400/0f172a/ef4444?text=XERA+PANEL",
-    keysAvailable: 102,
-    basePrice10: 450,
-    basePrice20: 750,
-    basePrice30: 1000,
-    features: FEATURES_PKG_2_TO_7
-  },
-  {
-    id: 7,
-    name: "TWISTER PANEL",
-    image: "https://placehold.co/600x400/0f172a/ef4444?text=TWISTER+PANEL",
-    keysAvailable: 917,
-    basePrice10: 250,
-    basePrice20: 450,
-    basePrice30: 700,
-    features: FEATURES_PKG_2_TO_7
-  }
-];
-
-// --- Sub-Components ---
-
-const LandingView = ({ setView }: { setView: (v: ViewState) =&gt; void }) =&gt; (
-  &lt;div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-black text-white p-6 text-center space-y-8"&gt;
-    &lt;motion.div 
-      initial={{ scale: 0.8, opacity: 0 }} 
-      animate={{ scale: 1, opacity: 1 }} 
-      className="space-y-4"
-    &gt;
-      &lt;h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500"&gt;
+  <!-- LANDING -->
+  <div id="view-landing" class="view flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-black p-6 text-center space-y-8">
+    <div class="space-y-4">
+      <h1 class="text-5xl font-bold gradient-text">
         Rajesh Gaming Store
-      &lt;/h1&gt;
-      &lt;p className="text-xl text-gray-400"&gt;Premium Digital Assets &amp; Gaming Tools&lt;/p&gt;
+      </h1>
+      <p class="text-xl text-gray-400">Premium Digital Assets & Gaming Tools</p>
       
-      &lt;div className="flex items-center justify-center space-x-2 text-sm text-gray-500"&gt;
-        &lt;span&gt;Seller: Rajesh&lt;/span&gt;
-        &lt;span className="w-1 h-1 bg-gray-500 rounded-full"&gt;&lt;/span&gt;
-        &lt;a href="#" className="text-blue-400 hover:underline"&gt;Follow on Instagram&lt;/a&gt;
-      &lt;/div&gt;
+      <div class="flex items-center justify-center space-x-2 text-sm text-gray-500">
+        <span>Seller: Rajesh</span>
+        <span class="w-1 h-1 bg-gray-500 rounded-full"></span>
+        <a href="#" class="text-blue-400 hover:underline">Follow on Instagram</a>
+      </div>
 
-      &lt;div className="inline-block px-4 py-2 bg-slate-800 rounded-full border border-slate-700"&gt;
-        &lt;span className="text-green-400 font-bold"&gt;15,000+&lt;/span&gt; Satisfied Users
-      &lt;/div&gt;
-    &lt;/motion.div&gt;
+      <div class="inline-block px-4 py-2 bg-slate-800 rounded-full border border-slate-700">
+        <span class="text-green-400 font-bold">15,000+</span> Satisfied Users
+      </div>
+    </div>
 
-    &lt;motion.button
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      onClick={() =&gt; setView('AUTH')}
-      className="px-8 py-4 bg-red-600 hover:bg-red-700 rounded-lg text-xl font-bold shadow-lg shadow-red-900/50 transition-all"
-    &gt;
+    <button onclick="showView('auth')"
+      class="px-8 py-4 bg-red-600 hover:bg-red-700 rounded-lg text-xl font-bold shadow-lg shadow-red-900/50 transition-all">
       ENTER STORE
-    &lt;/motion.button&gt;
-  &lt;/div&gt;
-);
+    </button>
+  </div>
 
-const AuthView = ({ handleLogin, isProcessing }: { handleLogin: (e: React.FormEvent) =&gt; void, isProcessing: boolean }) =&gt; (
-  &lt;div className="min-h-screen bg-slate-950 flex items-center justify-center p-4"&gt;
-    &lt;div className="w-full max-w-md bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl space-y-6"&gt;
-      &lt;div className="text-center"&gt;
-        &lt;h2 className="text-3xl font-bold text-white"&gt;Welcome Back&lt;/h2&gt;
-        &lt;p className="text-gray-400"&gt;Sign in to access the store&lt;/p&gt;
-      &lt;/div&gt;
+  <!-- AUTH / LOGIN -->
+  <div id="view-auth" class="view hidden min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl space-y-6">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold text-white">Welcome Back</h2>
+        <p class="text-gray-400">Sign in to access the store</p>
+      </div>
 
-      {isProcessing ? (
-         &lt;div className="flex flex-col items-center justify-center py-10 space-y-4"&gt;
-           &lt;div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"&gt;&lt;/div&gt;
-           &lt;p className="text-gray-400"&gt;Verifying Credentials...&lt;/p&gt;
-         &lt;/div&gt;
-      ) : (
-        &lt;form onSubmit={handleLogin} className="space-y-4"&gt;
-          &lt;div&gt;
-            &lt;label className="block text-sm font-medium text-gray-400 mb-1"&gt;Email or Phone&lt;/label&gt;
-            &lt;input required type="text" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-red-500 outline-none" placeholder="Enter your details" /&gt;
-          &lt;/div&gt;
-          &lt;div&gt;
-            &lt;label className="block text-sm font-medium text-gray-400 mb-1"&gt;Password&lt;/label&gt;
-            &lt;input required type="password" className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-red-500 outline-none" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" /&gt;
-          &lt;/div&gt;
-          &lt;button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition-colors"&gt;
-            LOGIN / SIGN UP
-          &lt;/button&gt;
-          &lt;p className="text-xs text-center text-gray-500"&gt;One-time login. You will remain logged in.&lt;/p&gt;
-        &lt;/form&gt;
-      )}
-    &lt;/div&gt;
-  &lt;/div&gt;
-);
+      <div id="auth-processing" class="hidden flex flex-col items-center justify-center py-10 space-y-4">
+        <div class="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-gray-400">Verifying Credentials...</p>
+      </div>
 
-const StoreView = ({ 
-  setView, 
-  orders, 
-  handleProductSelect 
-}: { 
-  setView: (v: ViewState) =&gt; void, 
-  orders: Order[], 
-  handleProductSelect: (p: Product) =&gt; void 
-}) =&gt; (
-  &lt;div className="min-h-screen bg-slate-950 text-white pb-20"&gt;
-    &lt;header className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-4 flex justify-between items-center"&gt;
-      &lt;h2 className="text-xl font-bold text-red-500"&gt;Rajesh Store&lt;/h2&gt;
-      &lt;div className="flex space-x-4"&gt;
-        {orders.length &gt; 0 &amp;&amp; (
-          &lt;button onClick={() =&gt; setView('HISTORY')} className="p-2 bg-slate-800 rounded-full hover:bg-slate-700"&gt;
-             &lt;History size={20} /&gt;
-          &lt;/button&gt;
-        )}
-        &lt;div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center font-bold"&gt;
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-400 mb-1">Email or Phone</label>
+          <input required type="text" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-red-500 outline-none" placeholder="Enter your details" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-400 mb-1">Password</label>
+          <input required type="password" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-red-500 outline-none" placeholder="••••••••" />
+        </div>
+        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition-colors">
+          LOGIN / SIGN UP
+        </button>
+        <p class="text-xs text-center text-gray-500">One-time login. You will remain logged in.</p>
+      </form>
+    </div>
+  </div>
+
+  <!-- STORE -->
+  <div id="view-store" class="view hidden min-h-screen pb-20">
+    <header class="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-4 flex justify-between items-center">
+      <h2 class="text-xl font-bold text-red-500">Rajesh Store</h2>
+      <div class="flex space-x-4">
+        <button onclick="showView('history')" class="p-2 bg-slate-800 rounded-full hover:bg-slate-700">
+          <i class="fas fa-history text-xl"></i>
+        </button>
+        <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center font-bold">
           R
-        &lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/header&gt;
+        </div>
+      </div>
+    </header>
 
-    &lt;div className="p-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3"&gt;
-      {PRODUCTS.map((product) =&gt; (
-        &lt;motion.div 
-          key={product.id} 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col space-y-4 hover:border-red-500/50 transition-colors"
-        &gt;
-          &lt;div className="h-40 w-full overflow-hidden rounded-lg bg-slate-800"&gt;
-             &lt;img 
-                src={product.image} 
-                alt={product.name} 
-                className="w-full h-full object-cover"
-                loading="lazy"
-             /&gt;
-          &lt;/div&gt;
-          &lt;div&gt;
-            &lt;h3 className="text-lg font-bold"&gt;{product.name}&lt;/h3&gt;
-            &lt;p className="text-sm text-green-400 font-mono"&gt;Only {product.keysAvailable} Keys Available&lt;/p&gt;
-          &lt;/div&gt;
-          &lt;button 
-            onClick={() =&gt; handleProductSelect(product)}
-            className="mt-auto w-full bg-white text-black font-bold py-2 rounded hover:bg-gray-200"
-          &gt;
-            BUY NOW
-          &lt;/button&gt;
-        &lt;/motion.div&gt;
-      ))}
-    &lt;/div&gt;
-  &lt;/div&gt;
-);
+    <div class="p-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <!-- Products will be inserted here by JS -->
+    </div>
+  </div>
 
-const DetailsView = ({ 
-  selectedProduct, 
-  setView, 
-  selectedDuration, 
-  setSelectedDuration, 
-  price 
-}: { 
-  selectedProduct: Product | null, 
-  setView: (v: ViewState) =&gt; void, 
-  selectedDuration: 10 | 20 | 30, 
-  setSelectedDuration: (d: 10 | 20 | 30) =&gt; void,
-  price: number
-}) =&gt; {
-  if (!selectedProduct) return null;
+  <!-- DETAILS -->
+  <div id="view-details" class="view hidden min-h-screen">
+    <header class="p-4 flex items-center space-x-4 border-b border-slate-800">
+      <button onclick="showView('store')" class="p-2 hover:bg-slate-800 rounded-full">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h2 class="font-bold text-lg">Product Details</h2>
+    </header>
 
-  return (
-    &lt;div className="min-h-screen bg-slate-950 text-white"&gt;
-      &lt;header className="p-4 flex items-center space-x-4 border-b border-slate-800"&gt;
-        &lt;button onClick={() =&gt; setView('STORE')} className="p-2 hover:bg-slate-800 rounded-full"&gt;
-          &lt;ArrowLeft /&gt;
-        &lt;/button&gt;
-        &lt;h2 className="font-bold text-lg"&gt;Product Details&lt;/h2&gt;
-      &lt;/header&gt;
+    <div class="p-6 space-y-6 max-w-2xl mx-auto">
+      <div class="text-center space-y-4">
+        <div class="w-full h-48 bg-slate-800 rounded-xl overflow-hidden">
+          <img id="detail-image" src="" alt="" class="w-full h-full object-cover" />
+        </div>
+        <h1 id="detail-name" class="text-2xl font-bold"></h1>
+      </div>
 
-      &lt;div className="p-6 space-y-6 max-w-2xl mx-auto"&gt;
-        &lt;div className="text-center space-y-4"&gt;
-          &lt;div className="w-full h-48 bg-slate-800 rounded-xl overflow-hidden"&gt;
-             &lt;img 
-               src={selectedProduct.image} 
-               alt={selectedProduct.name} 
-               className="w-full h-full object-cover"
-             /&gt;
-          &lt;/div&gt;
-          &lt;h1 className="text-2xl font-bold"&gt;{selectedProduct.name}&lt;/h1&gt;
-        &lt;/div&gt;
+      <div class="bg-slate-900 rounded-xl p-4 space-y-3 border border-slate-800">
+        <h3 class="text-gray-400 text-sm font-bold uppercase tracking-wider">Features</h3>
+        <ul id="detail-features" class="space-y-2"></ul>
+      </div>
 
-        &lt;div className="bg-slate-900 rounded-xl p-4 space-y-3 border border-slate-800"&gt;
-          &lt;h3 className="text-gray-400 text-sm font-bold uppercase tracking-wider"&gt;Features&lt;/h3&gt;
-          &lt;ul className="space-y-2"&gt;
-            {selectedProduct.features.map((feature, idx) =&gt; (
-              &lt;li key={idx} className="flex items-start space-x-2 text-sm"&gt;
-                &lt;CheckCircle size={16} className="text-green-500 mt-0.5 shrink-0" /&gt;
-                &lt;span&gt;{feature}&lt;/span&gt;
-              &lt;/li&gt;
-            ))}
-          &lt;/ul&gt;
-        &lt;/div&gt;
+      <div class="space-y-3">
+        <label class="text-sm text-gray-400 font-bold uppercase">Select Duration</label>
+        <div class="grid grid-cols-3 gap-3">
+          <button onclick="selectDuration(10)" class="duration-btn py-3 rounded-lg border font-bold transition-all bg-slate-900 border-slate-800 text-gray-400 hover:bg-slate-800">10 Days</button>
+          <button onclick="selectDuration(20)" class="duration-btn py-3 rounded-lg border font-bold transition-all bg-slate-900 border-slate-800 text-gray-400 hover:bg-slate-800">20 Days</button>
+          <button onclick="selectDuration(30)" class="duration-btn py-3 rounded-lg border font-bold transition-all bg-slate-900 border-slate-800 text-gray-400 hover:bg-slate-800">30 Days</button>
+        </div>
+      </div>
 
-        &lt;div className="space-y-3"&gt;
-          &lt;label className="text-sm text-gray-400 font-bold uppercase"&gt;Select Duration&lt;/label&gt;
-          &lt;div className="grid grid-cols-3 gap-3"&gt;
-            {[10, 20, 30].map((days) =&gt; (
-              &lt;button
-                key={days}
-                onClick={() =&gt; setSelectedDuration(days as 10 | 20 | 30)}
-                className={`py-3 rounded-lg border font-bold transition-all ${
-                  selectedDuration === days 
-                    ? 'bg-red-600 border-red-500 text-white'
-                    : 'bg-slate-900 border-slate-800 text-gray-400 hover:bg-slate-800'
-                }`}
-              &gt;
-                {days} Days
-              &lt;/button&gt;
-            ))}
-          &lt;/div&gt;
-        &lt;/div&gt;
+      <div class="flex items-center justify-between bg-slate-900 p-4 rounded-xl border border-slate-800">
+        <span class="text-gray-400">Total Price</span>
+        <span id="detail-price" class="text-2xl font-bold text-green-400">₹0</span>
+      </div>
 
-        &lt;div className="flex items-center justify-between bg-slate-900 p-4 rounded-xl border border-slate-800"&gt;
-          &lt;span className="text-gray-400"&gt;Total Price&lt;/span&gt;
-          &lt;span className="text-2xl font-bold text-green-400"&gt;â‚¹{price}&lt;/span&gt;
-        &lt;/div&gt;
+      <button onclick="showView('checkout')"
+        class="w-full bg-red-600 hover:bg-red-700 py-4 rounded-xl font-bold text-lg shadow-lg shadow-red-900/30">
+        ORDER NOW
+      </button>
+    </div>
+  </div>
 
-        &lt;button 
-          onClick={() =&gt; setView('CHECKOUT')}
-          className="w-full bg-red-600 hover:bg-red-700 py-4 rounded-xl font-bold text-lg shadow-lg shadow-red-900/30"
-        &gt;
-          ORDER NOW
-        &lt;/button&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-  );
-};
+  <!-- CHECKOUT -->
+  <div id="view-checkout" class="view hidden min-h-screen">
+    <header class="p-4 flex items-center space-x-4 border-b border-slate-800">
+      <button onclick="showView('details')" class="p-2 hover:bg-slate-800 rounded-full">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h2 class="font-bold text-lg">Checkout</h2>
+    </header>
 
-const CheckoutView = ({ 
-  price, 
-  setView, 
-  utrNumber, 
-  setUtrNumber, 
-  phoneNumber, 
-  setPhoneNumber, 
-  handlePlaceOrder 
-}: { 
-  price: number, 
-  setView: (v: ViewState) =&gt; void, 
-  utrNumber: string, 
-  setUtrNumber: (s: string) =&gt; void, 
-  phoneNumber: string, 
-  setPhoneNumber: (s: string) =&gt; void,
-  handlePlaceOrder: () =&gt; void
-}) =&gt; {
-  return (
-    &lt;div className="min-h-screen bg-slate-950 text-white"&gt;
-      &lt;header className="p-4 flex items-center space-x-4 border-b border-slate-800"&gt;
-        &lt;button onClick={() =&gt; setView('DETAILS')} className="p-2 hover:bg-slate-800 rounded-full"&gt;
-          &lt;ArrowLeft /&gt;
-        &lt;/button&gt;
-        &lt;h2 className="font-bold text-lg"&gt;Checkout&lt;/h2&gt;
-      &lt;/header&gt;
+    <div class="p-6 max-w-md mx-auto space-y-6">
+      <div class="bg-white text-black p-6 rounded-2xl flex flex-col items-center space-y-4">
+        <i class="fas fa-qrcode text-9xl"></i>
+        <div class="text-center">
+          <p class="font-bold text-xl uppercase tracking-widest">Scan & Pay</p>
+          <p id="checkout-amount" class="text-2xl font-bold mt-2">₹0</p>
+        </div>
+      </div>
 
-      &lt;div className="p-6 max-w-md mx-auto space-y-6"&gt;
-        &lt;div className="bg-white text-black p-6 rounded-2xl flex flex-col items-center space-y-4"&gt;
-           &lt;QrCode size={160} /&gt;
-           &lt;div className="text-center"&gt;
-             &lt;p className="font-bold text-xl uppercase tracking-widest"&gt;Scan &amp; Pay&lt;/p&gt;
-             &lt;p className="text-2xl font-bold mt-2"&gt;â‚¹{price}&lt;/p&gt;
-           &lt;/div&gt;
-        &lt;/div&gt;
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm text-gray-400 mb-1">UTR / Reference No (12 Digits)</label>
+          <input id="utr-input" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="12"
+            class="w-full bg-slate-900 border border-slate-700 p-4 rounded-lg font-mono text-lg focus:border-red-500 outline-none"
+            placeholder="Enter 12 digit UTR" />
+        </div>
 
-        &lt;div className="space-y-4"&gt;
-          &lt;div&gt;
-            &lt;label className="block text-sm text-gray-400 mb-1"&gt;UTR / Reference No (12 Digits)&lt;/label&gt;
-            {/* 
-                Improved Input for Mobile: 
-                type="tel" ensures numeric keypad opens on mobile.
-                inputMode="numeric" reinforces this.
-                pattern="[0-9]*" helps with validation.
-            */}
-            &lt;input 
-              type="tel" 
-              inputMode="numeric"
-              pattern="[0-9]*"
-              maxLength={12}
-              value={utrNumber}
-              onChange={(e) =&gt; setUtrNumber(e.target.value.replace(/\D/g, ''))}
-              className="w-full bg-slate-900 border border-slate-700 p-4 rounded-lg font-mono text-lg focus:border-red-500 outline-none"
-              placeholder="Enter 12 digit UTR"
-            /&gt;
-          &lt;/div&gt;
+        <div>
+          <label class="block text-sm text-gray-400 mb-1">WhatsApp Number for Delivery</label>
+          <input id="phone-input" type="tel" inputmode="numeric"
+            class="w-full bg-slate-900 border border-slate-700 p-4 rounded-lg font-mono text-lg focus:border-red-500 outline-none"
+            placeholder="Enter phone number" />
+        </div>
 
-          &lt;div&gt;
-            &lt;label className="block text-sm text-gray-400 mb-1"&gt;WhatsApp Number for Delivery&lt;/label&gt;
-            &lt;input 
-               type="tel"
-               inputMode="numeric"
-               value={phoneNumber}
-               onChange={(e) =&gt; setPhoneNumber(e.target.value)}
-               className="w-full bg-slate-900 border border-slate-700 p-4 rounded-lg font-mono text-lg focus:border-red-500 outline-none"
-               placeholder="Enter phone number"
-            /&gt;
-          &lt;/div&gt;
+        <button onclick="placeOrder()"
+          id="place-order-btn"
+          disabled
+          class="w-full bg-green-600 disabled:bg-slate-800 disabled:text-gray-500 hover:bg-green-700 py-4 rounded-xl font-bold text-lg">
+          PLACE ORDER
+        </button>
+      </div>
+    </div>
+  </div>
 
-          &lt;button 
-            onClick={handlePlaceOrder}
-            disabled={utrNumber.length !== 12 || !phoneNumber}
-            className="w-full bg-green-600 disabled:bg-slate-800 disabled:text-gray-500 hover:bg-green-700 py-4 rounded-xl font-bold text-lg"
-          &gt;
-            PLACE ORDER
-          &lt;/button&gt;
-        &lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-  );
-};
-
-const SuccessView = ({ setView }: { setView: (v: ViewState) =&gt; void }) =&gt; (
-  &lt;div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-6"&gt;
-    &lt;motion.div 
-      initial={{ scale: 0 }} 
-      animate={{ scale: 1 }} 
-      className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center text-white"
-    &gt;
-      &lt;CheckCircle size={48} /&gt;
-    &lt;/motion.div&gt;
+  <!-- SUCCESS -->
+  <div id="view-success" class="view hidden min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-6">
+    <div class="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center text-white">
+      <i class="fas fa-check-circle text-5xl"></i>
+    </div>
     
-    &lt;div&gt;
-      &lt;h2 className="text-3xl font-bold text-white mb-2"&gt;Order Placed!&lt;/h2&gt;
-      &lt;p className="text-gray-400 max-w-xs mx-auto"&gt;
-        Your key will be delivered to your WhatsApp within &lt;span className="text-white font-bold"&gt;10 - 15 minutes&lt;/span&gt;.
-      &lt;/p&gt;
-    &lt;/div&gt;
+    <div>
+      <h2 class="text-3xl font-bold text-white mb-2">Order Placed!</h2>
+      <p class="text-gray-400 max-w-xs mx-auto">
+        Your key will be delivered to your WhatsApp within <span class="text-white font-bold">10 - 15 minutes</span>.
+      </p>
+    </div>
 
-    &lt;button 
-      onClick={() =&gt; setView('STORE')}
-      className="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-medium"
-    &gt;
+    <button onclick="showView('store')"
+      class="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-medium">
       Back Home
-    &lt;/button&gt;
-  &lt;/div&gt;
-);
+    </button>
+  </div>
 
-const HistoryView = ({ orders, setView, copyToClipboard }: { orders: Order[], setView: (v: ViewState) =&gt; void, copyToClipboard: (t: string) =&gt; void }) =&gt; (
-  &lt;div className="min-h-screen bg-slate-950 text-white"&gt;
-    &lt;header className="p-4 flex items-center space-x-4 border-b border-slate-800 sticky top-0 bg-slate-950"&gt;
-      &lt;button onClick={() =&gt; setView('STORE')} className="p-2 hover:bg-slate-800 rounded-full"&gt;
-        &lt;ArrowLeft /&gt;
-      &lt;/button&gt;
-      &lt;h2 className="font-bold text-lg"&gt;Order History&lt;/h2&gt;
-    &lt;/header&gt;
+  <!-- HISTORY -->
+  <div id="view-history" class="view hidden min-h-screen">
+    <header class="p-4 flex items-center space-x-4 border-b border-slate-800 sticky top-0 bg-slate-950">
+      <button onclick="showView('store')" class="p-2 hover:bg-slate-800 rounded-full">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h2 class="font-bold text-lg">Order History</h2>
+    </header>
 
-    &lt;div className="p-4 space-y-4"&gt;
-      {orders.length === 0 ? (
-         &lt;p className="text-center text-gray-500 mt-10"&gt;No orders yet.&lt;/p&gt;
-      ) : (
-        orders.map((order) =&gt; (
-          &lt;div key={order.id} className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3"&gt;
-            &lt;div className="flex justify-between items-start"&gt;
-              &lt;h3 className="font-bold text-lg"&gt;{order.productName}&lt;/h3&gt;
-              &lt;span className="px-2 py-1 bg-yellow-500/20 text-yellow-500 text-xs rounded font-bold uppercase"&gt;
-                {order.status}
-              &lt;/span&gt;
-            &lt;/div&gt;
-            &lt;div className="text-sm text-gray-400 grid grid-cols-2 gap-2"&gt;
-               &lt;span&gt;Duration: {order.duration} Days&lt;/span&gt;
-               &lt;span&gt;Price: â‚¹{order.price}&lt;/span&gt;
-               &lt;span&gt;Date: {order.date}&lt;/span&gt;
-            &lt;/div&gt;
-            &lt;div 
-              onClick={() =&gt; copyToClipboard(order.transactionId)}
-              className="bg-black/30 p-2 rounded border border-dashed border-gray-700 flex justify-between items-center cursor-pointer hover:bg-black/50"
-            &gt;
-              &lt;span className="text-xs text-gray-500 font-mono"&gt;TRX: {order.transactionId}&lt;/span&gt;
-              &lt;QrCode size={14} className="text-gray-500" /&gt;
-            &lt;/div&gt;
-          &lt;/div&gt;
-        ))
-      )}
-    &lt;/div&gt;
-  &lt;/div&gt;
-);
+    <div id="history-list" class="p-4 space-y-4">
+      <!-- Orders inserted by JS -->
+    </div>
+  </div>
 
-// --- Main App Component ---
+  <script>
+    let currentView = 'landing';
+    let selectedProduct = null;
+    let selectedDuration = 10;
+    let orders = [];
 
-export default function App() {
-  const [view, setView] = useState&lt;ViewState&gt;('LANDING');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState&lt;Product | null&gt;(null);
-  const [selectedDuration, setSelectedDuration] = useState&lt;10 | 20 | 30&gt;(10);
-  const [orders, setOrders] = useState&lt;Order[]&gt;([]);
-  
-  // Checkout Form State
-  const [utrNumber, setUtrNumber] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
+    const products = [
+      { id:1, name:"HAXXCKER PRO INJECTOR", image:"https://placehold.co/600x400/0f172a/ef4444?text=HAXXCKER+PRO", keys:1227, p10:550, p20:1050, p30:1450,
+        features:["HEADSHOT HACK","ESP LINE LOCATION","ESP NAME","ESP HEALTH","STREAMER MODE","HIDE FROM SCREEN CAPTURE","AIM FOV 360°"] },
+      { id:2, name:"BR MODS", image:"https://placehold.co/600x400/0f172a/ef4444?text=BR+MODS", keys:371, p10:400, p20:750, p30:1050,
+        features:["AIM KILL","AIM MAGNET","SILENT AIM","AIMBOT LIGHT","SPEED TIMER","GHOST HACK","ESP LINE LOCATION","ESP NAME","ESP HEALTH","CS / BR RANK WORKING"] },
+      { id:3, name:"PATO TEAM", image:"https://placehold.co/600x400/0f172a/ef4444?text=PATO+TEAM", keys:2611, p10:550, p20:1050, p30:1450,
+        features:[] /* same as above */ },
+      { id:4, name:"Drip Client", image:"https://placehold.co/600x400/0f172a/ef4444?text=DRIP+CLIENT", keys:738, p10:150, p20:300, p30:450,
+        features:[] },
+      { id:5, name:"HG CHEATS", image:"https://placehold.co/600x400/0f172a/ef4444?text=HG+CHEATS", keys:572, p10:499, p20:759, p30:999,
+        features:[] },
+      { id:6, name:"XERA PANEL", image:"https://placehold.co/600x400/0f172a/ef4444?text=XERA+PANEL", keys:102, p10:450, p20:750, p30:1000,
+        features:[] },
+      { id:7, name:"TWISTER PANEL", image:"https://placehold.co/600x400/0f172a/ef4444?text=TWISTER+PANEL", keys:917, p10:250, p20:450, p30:700,
+        features:[] },
+    ];
 
-  // Handlers
-  const handleLogin = (e: React.FormEvent) =&gt; {
-    e.preventDefault();
-    setIsProcessing(true);
-    setTimeout(() =&gt; {
-      setIsLoggedIn(true);
-      setIsProcessing(false);
-      setView('STORE');
-    }, 2000);
-  };
+    function showView(viewName) {
+      document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+      document.getElementById(`view-${viewName}`).classList.remove('hidden');
+      currentView = viewName;
 
-  const handleProductSelect = (product: Product) =&gt; {
-    setSelectedProduct(product);
-    setSelectedDuration(10); // Reset to default
-    setView('DETAILS');
-  };
+      if (viewName === 'store') renderStore();
+      if (viewName === 'details') renderDetails();
+      if (viewName === 'checkout') renderCheckout();
+      if (viewName === 'history') renderHistory();
+    }
 
-  const getPrice = () =&gt; {
-    if (!selectedProduct) return 0;
-    if (selectedDuration === 10) return selectedProduct.basePrice10;
-    if (selectedDuration === 20) return selectedProduct.basePrice20;
-    return selectedProduct.basePrice30;
-  };
+    function renderStore() {
+      const container = document.querySelector('#view-store .grid');
+      container.innerHTML = '';
+      products.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col space-y-4 hover:border-red-500/50 transition-colors';
+        card.innerHTML = `
+          <div class="h-40 w-full overflow-hidden rounded-lg bg-slate-800">
+            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover" loading="lazy">
+          </div>
+          <div>
+            <h3 class="text-lg font-bold">${p.name}</h3>
+            <p class="text-sm text-green-400 font-mono">Only ${p.keys} Keys Available</p>
+          </div>
+          <button onclick="selectProduct(${p.id})" class="mt-auto w-full bg-white text-black font-bold py-2 rounded hover:bg-gray-200">
+            BUY NOW
+          </button>
+        `;
+        container.appendChild(card);
+      });
+    }
 
-  const handlePlaceOrder = () =&gt; {
-    if (!selectedProduct) return;
+    function selectProduct(id) {
+      selectedProduct = products.find(p => p.id === id);
+      selectedDuration = 10;
+      showView('details');
+    }
 
-    const randomTxnId = 'TXN' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    function renderDetails() {
+      if (!selectedProduct) return;
+      document.getElementById('detail-image').src = selectedProduct.image;
+      document.getElementById('detail-name').textContent = selectedProduct.name;
 
-    const newOrder: Order = {
-      id: Math.random().
+      const feats = document.getElementById('detail-features');
+      feats.innerHTML = '';
+      (selectedProduct.features || []).forEach(f => {
+        feats.innerHTML += `<li class="flex items-start space-x-2 text-sm"><i class="fas fa-check-circle text-green-500 mt-1 text-sm"></i><span>${f}</span></li>`;
+      });
+
+      updatePrice();
+      document.querySelectorAll('.duration-btn').forEach(btn => {
+        btn.classList.remove('bg-red-600','border-red-500','text-white');
+        btn.classList.add('bg-slate-900','border-slate-800','text-gray-400','hover:bg-slate-800');
+      });
+      document.querySelector(`.duration-btn[onclick="selectDuration(${selectedDuration})"]`).classList.add('bg-red-600','border-red-500','text-white');
+      document.querySelector(`.duration-btn[onclick="selectDuration(${selectedDuration})"]`).classList.remove('bg-slate-900','border-slate-800','text-gray-400','hover:bg-slate-800');
+    }
+
+    function selectDuration(days) {
+      selectedDuration = days;
+      renderDetails();
+    }
+
+    function updatePrice() {
+      if (!selectedProduct) return;
+      const price = selectedDuration === 10 ? selectedProduct.p10 :
+                    selectedDuration === 20 ? selectedProduct.p20 : selectedProduct.p30;
+      document.getElementById('detail-price').textContent = `₹${price}`;
+    }
+
+    function renderCheckout() {
+      if (!selectedProduct) return;
+      const price = selectedDuration === 10 ? selectedProduct.p10 :
+                    selectedDuration === 20 ? selectedProduct.p20 : selectedProduct.p30;
+      document.getElementById('checkout-amount').textContent = `₹${price}`;
+      checkPlaceOrderButton();
+    }
+
+    function checkPlaceOrderButton() {
+      const utr = document.getElementById('utr-input').value;
+      const phone = document.getElementById('phone-input').value;
+      const btn = document.getElementById('place-order-btn');
+      btn.disabled = (utr.length !== 12 || !phone);
+    }
+
+    function placeOrder() {
+      if (!selectedProduct) return;
+      const price = selectedDuration === 10 ? selectedProduct.p10 :
+                    selectedDuration === 20 ? selectedProduct.p20 : selectedProduct.p30;
+
+      const newOrder = {
+        id: Math.random().toString(36).substr(2,9),
+        productName: selectedProduct.name,
+        duration: selectedDuration,
+        price: price,
+        date: new Date().toLocaleDateString(),
+        status: 'Pending',
+        transactionId: 'TXN' + Math.random().toString(36).substr(2,9).toUpperCase(),
+        utr: document.getElementById('utr-input').value
+      };
+
+      orders.unshift(newOrder);
+      document.getElementById('utr-input').value = '';
+      document.getElementById('phone-input').value = '';
+      showView('success');
+    }
+
+    function renderHistory() {
+      const container = document.getElementById('history-list');
+      if (orders.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 mt-10">No orders yet.</p>';
+        return;
+      }
+      container.innerHTML = '';
+      orders.forEach(o => {
+        const div = document.createElement('div');
+        div.className = 'bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3';
+        div.innerHTML = `
+          <div class="flex justify-between items-start">
+            <h3 class="font-bold text-lg">${o.productName}</h3>
+            <span class="px-2 py-1 bg-yellow-500/20 text-yellow-500 text-xs rounded font-bold uppercase">${o.status}</span>
+          </div>
+          <div class="text-sm text-gray-400 grid grid-cols-2 gap-2">
+            <span>Duration: ${o.duration} Days</span>
+            <span>Price: ₹${o.price}</span>
+            <span>Date: ${o.date}</span>
+          </div>
+          <div onclick="copyToClipboard('${o.transactionId}')" class="bg-black/30 p-2 rounded border border-dashed border-gray-700 flex justify-between items-center cursor-pointer hover:bg-black/50">
+            <span class="text-xs text-gray-500 font-mono">TRX: ${o.transactionId}</span>
+            <i class="fas fa-qrcode text-gray-500"></i>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard!');
+      });
+    }
+
+    // Login simulation
+    document.getElementById('login-form').addEventListener('submit', e => {
+      e.preventDefault();
+      document.getElementById('auth-processing').classList.remove('hidden');
+      document.querySelector('#view-auth form').classList.add('hidden');
+      setTimeout(() => {
+        showView('store');
+      }, 2000);
+    });
+
+    // Input listeners for checkout
+    document.getElementById('utr-input').addEventListener('input', e => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0,12);
+      checkPlaceOrderButton();
+    });
+    document.getElementById('phone-input').addEventListener('input', checkPlaceOrderButton);
+
+    // Start
+    showView('landing');
+  </script>
+</body>
+</html>
