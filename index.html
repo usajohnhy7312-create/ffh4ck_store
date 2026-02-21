@@ -1,236 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <title>Rajesh Gaming Store</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #020617; color: white; margin: 0; }
-        .view-hidden { display: none; }
-        .animate-spin { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    </style>
+  <meta charset="UTF-8">
+  <title>Rajesh Gaming Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-950 text-white font-sans">
 
-    <div id="app">
-        <div id="view-LANDING" class="view flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-black p-6 text-center space-y-8">
-            <div class="space-y-4">
-                <h1 class="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">Rajesh Gaming Store</h1>
-                <p class="text-xl text-gray-400">Premium Digital Assets & Gaming Tools</p>
-                <div class="flex items-center justify-center space-x-2 text-sm text-gray-500">
-                    <span>Seller: Rajesh</span>
-                    <span class="w-1 h-1 bg-gray-500 rounded-full"></span>
-                    <a href="#" class="text-blue-400 hover:underline">Follow on Instagram</a>
-                </div>
-                <div class="inline-block px-4 py-2 bg-slate-800 rounded-full border border-slate-700">
-                    <span class="text-green-400 font-bold">15,000+</span> Satisfied Users
-                </div>
-            </div>
-            <button onclick="navigate('AUTH')" class="px-8 py-4 bg-red-600 hover:bg-red-700 rounded-lg text-xl font-bold shadow-lg shadow-red-900/50 transition-all">ENTER STORE</button>
-        </div>
+<!-- LANDING VIEW -->
+<div id="landing" class="flex flex-col items-center justify-center min-h-screen text-center p-6 space-y-8 bg-gradient-to-br from-slate-900 to-black">
+  <div class="space-y-4">
+    <h1 class="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
+      Rajesh Gaming Store
+    </h1>
+    <p class="text-xl text-gray-400">Premium Digital Assets & Gaming Tools</p>
 
-        <div id="view-AUTH" class="view view-hidden min-h-screen bg-slate-950 flex items-center justify-center p-4">
-            <div class="w-full max-w-md bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl space-y-6">
-                <div id="auth-content">
-                    <div class="text-center mb-6">
-                        <h2 class="text-3xl font-bold text-white">Welcome Back</h2>
-                        <p class="text-gray-400">Sign in to access the store</p>
-                    </div>
-                    <form onsubmit="handleLogin(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-1">Email or Phone</label>
-                            <input required type="text" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-red-500 outline-none" placeholder="Enter your details">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-1">Password</label>
-                            <input required type="password" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-red-500 outline-none" placeholder="••••••••">
-                        </div>
-                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition-colors">LOGIN / SIGN UP</button>
-                    </form>
-                </div>
-                <div id="auth-loading" class="view-hidden flex flex-col items-center justify-center py-10 space-y-4">
-                    <div class="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p class="text-gray-400">Verifying Credentials...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-STORE" class="view view-hidden min-h-screen bg-slate-950 pb-20">
-            <header class="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 p-4 flex justify-between items-center">
-                <h2 class="text-xl font-bold text-red-500">Rajesh Store</h2>
-                <div class="flex space-x-4">
-                    <button id="history-btn" onclick="navigate('HISTORY')" class="p-2 bg-slate-800 rounded-full hover:bg-slate-700 hidden">
-                        <i data-lucide="history" size="20"></i>
-                    </button>
-                    <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center font-bold">R</div>
-                </div>
-            </header>
-            <div id="product-grid" class="p-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3"></div>
-        </div>
-
-        <div id="view-DETAILS" class="view view-hidden min-h-screen bg-slate-950">
-            <header class="p-4 flex items-center space-x-4 border-b border-slate-800">
-                <button onclick="navigate('STORE')" class="p-2 hover:bg-slate-800 rounded-full"><i data-lucide="arrow-left"></i></button>
-                <h2 class="font-bold text-lg">Product Details</h2>
-            </header>
-            <div id="details-container" class="p-6 space-y-6 max-w-2xl mx-auto"></div>
-        </div>
-
-        <div id="view-CHECKOUT" class="view view-hidden min-h-screen bg-slate-950">
-            <header class="p-4 flex items-center space-x-4 border-b border-slate-800">
-                <button onclick="navigate('DETAILS')" class="p-2 hover:bg-slate-800 rounded-full"><i data-lucide="arrow-left"></i></button>
-                <h2 class="font-bold text-lg">Checkout</h2>
-            </header>
-            <div class="p-6 max-w-md mx-auto space-y-6">
-                <div class="bg-white text-black p-6 rounded-2xl flex flex-col items-center space-y-4">
-                    <i data-lucide="qr-code" size="160" class="w-40 h-40"></i>
-                    <div class="text-center">
-                        <p class="font-bold text-xl uppercase tracking-widest">Scan & Pay</p>
-                        <p id="checkout-price-display" class="text-2xl font-bold mt-2">₹0</p>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <input id="utr-input" type="tel" maxlength="12" oninput="validateCheckout()" class="w-full bg-slate-900 border border-slate-700 p-4 rounded-lg font-mono text-lg focus:border-red-500 outline-none" placeholder="Enter 12 digit UTR">
-                    <input id="phone-input" type="tel" oninput="validateCheckout()" class="w-full bg-slate-900 border border-slate-700 p-4 rounded-lg font-mono text-lg focus:border-red-500 outline-none" placeholder="Enter WhatsApp number">
-                    <button id="place-order-btn" onclick="handlePlaceOrder()" disabled class="w-full bg-green-600 disabled:bg-slate-800 disabled:text-gray-500 py-4 rounded-xl font-bold text-lg">PLACE ORDER</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-SUCCESS" class="view view-hidden min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-6">
-            <div class="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center text-white"><i data-lucide="check-circle" size="48"></i></div>
-            <h2 class="text-3xl font-bold text-white">Order Placed!</h2>
-            <p class="text-gray-400">Your key will be delivered to your WhatsApp within <span class="text-white font-bold">10 - 15 minutes</span>.</p>
-            <button onclick="navigate('STORE')" class="px-8 py-3 bg-slate-800 rounded-lg">Back Home</button>
-        </div>
-
-        <div id="view-HISTORY" class="view view-hidden min-h-screen bg-slate-950">
-            <header class="p-4 flex items-center space-x-4 border-b border-slate-800 sticky top-0 bg-slate-950">
-                <button onclick="navigate('STORE')" class="p-2 hover:bg-slate-800 rounded-full"><i data-lucide="arrow-left"></i></button>
-                <h2 class="font-bold text-lg">Order History</h2>
-            </header>
-            <div id="history-list" class="p-4 space-y-4"></div>
-        </div>
+    <div class="flex items-center justify-center space-x-2 text-sm text-gray-500">
+      <span>Seller: Rajesh</span>
+      <span class="w-1 h-1 bg-gray-500 rounded-full"></span>
+      <a href="#" class="text-blue-400 hover:underline">Follow on Instagram</a>
     </div>
 
-    <script>
-        [cite_start]// --- Data [cite: 6, 11] ---
-        const PRODUCTS = [
-            { id: 1, name: "HAXXCKER PRO INJECTOR", image: "https://placehold.co/600x400/0f172a/ef4444?text=HAXXCKER+PRO", keysAvailable: 1227, prices: {10: 550, 20: 1050, 30: 1450}, features: ["HEADSHOT HACK", "ESP LINE LOCATION", "ESP NAME", "ESP HEALTH", "STREAMER MODE"] },
-            { id: 2, name: "BR MODS", image: "https://placehold.co/600x400/0f172a/ef4444?text=BR+MODS", keysAvailable: 371, prices: {10: 400, 20: 750, 30: 1050}, features: ["AIM KILL", "AIM MAGNET", "SILENT AIM", "GHOST HACK"] },
-            { id: 3, name: "PATO TEAM", image: "https://placehold.co/600x400/0f172a/ef4444?text=PATO+TEAM", keysAvailable: 2611, prices: {10: 550, 20: 1050, 30: 1450}, features: ["AIMBOT LIGHT", "SPEED TIMER", "ESP NAME"] },
-            { id: 4, name: "Drip Client", image: "https://placehold.co/600x400/0f172a/ef4444?text=DRIP+CLIENT", keysAvailable: 738, prices: {10: 150, 20: 300, 30: 450}, features: ["AIM KILL", "ESP HEALTH"] },
-            { id: 5, name: "HG CHEATS", image: "https://placehold.co/600x400/0f172a/ef4444?text=HG+CHEATS", keysAvailable: 572, prices: {10: 499, 20: 759, 30: 999}, features: ["GHOST HACK", "CS / BR RANK"] },
-            { id: 6, name: "XERA PANEL", image: "https://placehold.co/600x400/0f172a/ef4444?text=XERA+PANEL", keysAvailable: 102, prices: {10: 450, 20: 750, 30: 1000}, features: ["SILENT AIM", "AIM MAGNET"] },
-            { id: 7, name: "TWISTER PANEL", image: "https://placehold.co/600x400/0f172a/ef4444?text=TWISTER+PANEL", keysAvailable: 917, prices: {10: 250, 20: 450, 30: 700}, features: ["ESP LINE", "AIMBOT LIGHT"] }
-        ];
+    <div class="inline-block px-4 py-2 bg-slate-800 rounded-full border border-slate-700">
+      <span class="text-green-400 font-bold">15,000+</span> Satisfied Users
+    </div>
+  </div>
 
-        let state = { currentView: 'LANDING', selectedProduct: null, selectedDuration: 10, orders: [] };
+  <button onclick="showAuth()" class="px-8 py-4 bg-red-600 hover:bg-red-700 rounded-lg text-xl font-bold">
+    ENTER STORE
+  </button>
+</div>
 
-        [cite_start]// --- Logic [cite: 56, 64] ---
-        function navigate(view) {
-            document.querySelectorAll('.view').forEach(el => el.classList.add('view-hidden'));
-            document.getElementById('view-' + view).classList.remove('view-hidden');
-            if (view === 'STORE') renderStore();
-            if (view === 'HISTORY') renderHistory();
-            lucide.createIcons();
-        }
+<!-- AUTH VIEW -->
+<div id="auth" class="hidden min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md bg-slate-900 p-8 rounded-2xl border border-slate-800 space-y-6">
+    <div class="text-center">
+      <h2 class="text-3xl font-bold">Welcome Back</h2>
+      <p class="text-gray-400">Sign in to access the store</p>
+    </div>
 
-        function handleLogin(e) {
-            e.preventDefault();
-            document.getElementById('auth-content').classList.add('view-hidden');
-            document.getElementById('auth-loading').classList.remove('view-hidden');
-            setTimeout(() => { navigate('STORE'); }, 2000);
-        }
+    <form onsubmit="login(event)" class="space-y-4">
+      <input required type="text" placeholder="Email or Phone"
+        class="w-full bg-slate-800 border border-slate-700 rounded-lg p-3">
+      <input required type="password" placeholder="Password"
+        class="w-full bg-slate-800 border border-slate-700 rounded-lg p-3">
+      <button class="w-full bg-red-600 py-3 rounded-lg font-bold">
+        LOGIN / SIGN UP
+      </button>
+    </form>
+  </div>
+</div>
 
-        function renderStore() {
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = PRODUCTS.map(p => `
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col space-y-4 hover:border-red-500/50 transition-colors">
-                    <img src="${p.image}" class="h-40 w-full object-cover rounded-lg bg-slate-800">
-                    <div>
-                        <h3 class="text-lg font-bold">${p.name}</h3>
-                        <p class="text-sm text-green-400 font-mono">Only ${p.keysAvailable} Keys Available</p>
-                    </div>
-                    <button onclick="selectProduct(${p.id})" class="mt-auto w-full bg-white text-black font-bold py-2 rounded hover:bg-gray-200">BUY NOW</button>
-                </div>
-            `).join('');
-            document.getElementById('history-btn').classList.toggle('hidden', state.orders.length === 0);
-        }
+<!-- STORE VIEW -->
+<div id="store" class="hidden min-h-screen p-4">
+  <h2 class="text-xl font-bold text-red-500 mb-6">Rajesh Store</h2>
 
-        function selectProduct(id) {
-            state.selectedProduct = PRODUCTS.find(p => p.id === id);
-            state.selectedDuration = 10;
-            renderDetails();
-            navigate('DETAILS');
-        }
+  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 
-        function renderDetails() {
-            const p = state.selectedProduct;
-            const container = document.getElementById('details-container');
-            container.innerHTML = `
-                <div class="text-center space-y-4">
-                    <img src="${p.image}" class="w-full h-48 object-cover rounded-xl bg-slate-800">
-                    <h1 class="text-2xl font-bold">${p.name}</h1>
-                </div>
-                <div class="bg-slate-900 rounded-xl p-4 space-y-3 border border-slate-800">
-                    <h3 class="text-gray-400 text-sm font-bold uppercase tracking-wider">Features</h3>
-                    <ul class="space-y-2">${p.features.map(f => `<li class="flex items-start space-x-2 text-sm"><i data-lucide="check-circle" class="text-green-500 mt-0.5 shrink-0 w-4 h-4"></i><span>${f}</span></li>`).join('')}</ul>
-                </div>
-                <div class="grid grid-cols-3 gap-3">
-                    ${[10, 20, 30].map(d => `<button onclick="updateDuration(${d})" class="py-3 rounded-lg border font-bold transition-all ${state.selectedDuration === d ? 'bg-red-600 border-red-500 text-white' : 'bg-slate-900 border-slate-800 text-gray-400'}">${d} Days</button>`).join('')}
-                </div>
-                <div class="flex items-center justify-between bg-slate-900 p-4 rounded-xl border border-slate-800">
-                    <span class="text-gray-400">Total Price</span>
-                    <span class="text-2xl font-bold text-green-400">₹${p.prices[state.selectedDuration]}</span>
-                </div>
-                <button onclick="navigate('CHECKOUT'); document.getElementById('checkout-price-display').innerText = '₹' + ${p.prices[state.selectedDuration]}" class="w-full bg-red-600 py-4 rounded-xl font-bold text-lg">ORDER NOW</button>
-            `;
-            lucide.createIcons();
-        }
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-4">
+      <img src="https://placehold.co/600x400/0f172a/ef4444?text=HAXXCKER+PRO"
+        class="rounded-lg">
+      <h3 class="font-bold">HAXXCKER PRO INJECTOR</h3>
+      <p class="text-green-400">Only 1227 Keys Available</p>
+      <button class="w-full bg-white text-black font-bold py-2 rounded">
+        BUY NOW
+      </button>
+    </div>
 
-        function updateDuration(d) { state.selectedDuration = d; renderDetails(); }
+  </div>
+</div>
 
-        function validateCheckout() {
-            const utr = document.getElementById('utr-input').value.replace(/\D/g, '');
-            document.getElementById('utr-input').value = utr;
-            const phone = document.getElementById('phone-input').value;
-            document.getElementById('place-order-btn').disabled = (utr.length !== 12 || !phone);
-        }
+<script>
+function showAuth() {
+  document.getElementById("landing").classList.add("hidden");
+  document.getElementById("auth").classList.remove("hidden");
+}
 
-        function handlePlaceOrder() {
-            const order = {
-                id: Math.random().toString(36).substr(2, 9),
-                productName: state.selectedProduct.name,
-                duration: state.selectedDuration,
-                price: state.selectedProduct.prices[state.selectedDuration],
-                date: new Date().toLocaleDateString(),
-                status: 'Pending',
-                transactionId: 'TXN' + Math.random().toString(36).substr(2, 9).toUpperCase()
-            };
-            state.orders.unshift(order);
-            navigate('SUCCESS');
-        }
+function login(e) {
+  e.preventDefault();
+  document.getElementById("auth").classList.add("hidden");
+  document.getElementById("store").classList.remove("hidden");
+}
+</script>
 
-        function renderHistory() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = state.orders.map(o => `
-                <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-3">
-                    <div class="flex justify-between items-start"><h3 class="font-bold text-lg">${o.productName}</h3><span class="px-2 py-1 bg-yellow-500/20 text-yellow-500 text-xs rounded font-bold uppercase">${o.status}</span></div>
-                    <div class="text-sm text-gray-400 grid grid-cols-2 gap-2"><span>Duration: ${o.duration} Days</span><span>Price: ₹${o.price}</span><span>Date: ${o.date}</span></div>
-                    <div onclick="navigator.clipboard.writeText('${o.transactionId}'); alert('Copied!')" class="bg-black/30 p-2 rounded border border-dashed border-gray-700 flex justify-between items-center cursor-pointer hover:bg-black/50">
-                        <span class="text-xs text-gray-500 font-mono">TRX: ${o.transactionId}</span><i data-lucide="qr-code" class="text-gray-500 w-4 h-4"></i>
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
-
-        lucide.createIcons();
-    </script>
 </body>
 </html>
