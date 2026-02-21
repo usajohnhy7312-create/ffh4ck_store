@@ -29,7 +29,7 @@
       <div class="flex items-center justify-center space-x-2 text-sm text-gray-500">
         <span>Seller: Rajesh</span>
         <span class="w-1 h-1 bg-gray-500 rounded-full"></span>
-        <a href="#" class="text-blue-400 hover:underline">Follow on Instagram</a>
+        <a href="https://www.instagram.com/not_rajesh.2_0?igsh=cmk4a3pvenppaDF1" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline">Follow on Instagram</a>
       </div>
 
       <div class="inline-block px-4 py-2 bg-slate-800 rounded-full border border-slate-700">
@@ -325,50 +325,21 @@
       const price = selectedDuration === 10 ? selectedProduct.p10 :
                     selectedDuration === 20 ? selectedProduct.p20 : selectedProduct.p30;
 
-      const utr = document.getElementById('utr-input').value;
-      const phone = document.getElementById('phone-input').value;
-
-      const formData = {
-        product: selectedProduct.name,
-        duration: selectedDuration + " Days",
-        price: "₹" + price,
-        utr: utr,
-        whatsapp_number: phone,
-        date: new Date().toLocaleString(),
-        _subject: "Naya Order Aaya - Rajesh Gaming Store"
+      const newOrder = {
+        id: Math.random().toString(36).substr(2,9),
+        productName: selectedProduct.name,
+        duration: selectedDuration,
+        price: price,
+        date: new Date().toLocaleDateString(),
+        status: 'Pending',
+        transactionId: 'TXN' + Math.random().toString(36).substr(2,9).toUpperCase(),
+        utr: document.getElementById('utr-input').value
       };
 
-      fetch('https://formspree.io/f/mgolnkeq', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      })
-      .then(response => {
-        if (response.ok) {
-          const newOrder = {
-            id: Math.random().toString(36).substr(2,9),
-            productName: selectedProduct.name,
-            duration: selectedDuration,
-            price: price,
-            date: new Date().toLocaleDateString(),
-            status: 'Pending',
-            transactionId: 'TXN' + Math.random().toString(36).substr(2,9).toUpperCase(),
-            utr: utr
-          };
-          orders.unshift(newOrder);
-          document.getElementById('utr-input').value = '';
-          document.getElementById('phone-input').value = '';
-          showView('success');
-        } else {
-          alert("Kuch gadbad ho gayi, please dubara try karo ya WhatsApp pe contact karo.");
-        }
-      })
-      .catch(error => {
-        alert("Network issue: " + error.message);
-      });
+      orders.unshift(newOrder);
+      document.getElementById('utr-input').value = '';
+      document.getElementById('phone-input').value = '';
+      showView('success');
     }
 
     function renderHistory() {
